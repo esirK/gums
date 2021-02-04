@@ -50,14 +50,7 @@ void loop() {
     connected = sim800l->connectGPRS();
   }
 
-  // Check if connected, if not reset the module and setup the config again
-  if(connected) {
-    Serial.println(F("connected !"));
-  } else {
-    Serial.println(F("Reset the module."));
-    sim800l->reset();
-    setupModule();
-  }
+  check_connection(connected);
 
   Serial.println(F("Start HTTP POST..."));
   
@@ -118,17 +111,8 @@ void setupModule() {
     delay(1000);
     connected = sim800l->connectGPRS();
   }
+  check_connection(connected);
 
-  // Check if connected, if not reset the module and setup the config again
-  if(connected) {
-    Serial.println(F("GPRS connected !"));
-  } else {
-    Serial.println(F("GPRS not connected !"));
-    Serial.println(F("Reset the module."));
-    sim800l->reset();
-    setupModule();
-    return;
-  }
     // Wait until the module is ready to accept AT commands
   while(!sim800l->isReady()) {
     Serial.println(F("Problem to initialize AT command, retry in 1 sec"));
@@ -163,4 +147,16 @@ void setupModule() {
     delay(5000);
   }
   Serial.println(F("GPRS config OK"));
+}
+
+void check_connection(bool connected) {
+  // Check if connected, if not reset the module and setup the config again
+  if(connected) {
+    Serial.println(F("GPRS connected !"));
+  } else {
+    Serial.println(F("GPRS not connected !"));
+    Serial.println(F("Reset the module."));
+    sim800l->reset();
+    setupModule();
+  }
 }
